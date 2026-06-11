@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0a0a1a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="description" content="MyStream - Watch movies, web series, kids shows & more for free!">
+<meta name="keywords" content="MyStream, movies, web series, free streaming, Hindi movies">
+<meta property="og:title" content="MyStream">
+<meta property="og:description" content="Free movie & web series streaming app. Watch anytime, anywhere!">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MyStream">
+<meta name="twitter:description" content="Free movie & web series streaming app">
+<title>MyStream</title>
+<link rel="manifest" href="manifest.json">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--bg:#0a0a1a;--card:#13133a;--card2:#1a1a4e;--accent:#6c5ce7;--accent2:#a29bfe;--text:#eee;--text2:#888;--nav:#0d0d2b;--shadow:0 4px 20px rgba(0,0,0,.5)}
+body{font-family:-apple-system,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--accent);border-radius:4px}
+/* HEADER */
+.header{position:sticky;top:0;z-index:100;background:linear-gradient(180deg,#0a0a1a 60%,transparent);padding:12px 16px 8px;display:flex;align-items:center;justify-content:space-between}
+.header .logo{font-size:22px;font-weight:800;color:#fff;display:flex;align-items:center;gap:8px}
+.header .logo span{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header-actions{display:flex;gap:12px;align-items:center}
+.header-actions button{background:none;border:none;color:#fff;font-size:22px;padding:6px;cursor:pointer;border-radius:50%;transition:.2s}
+.header-actions button:active{background:rgba(255,255,255,.1)}
+/* NAV TABS */
+.tabs-wrap{overflow-x:auto;padding:4px 16px 8px;white-space:nowrap;-webkit-overflow-scrolling:touch}
+.tabs{display:inline-flex;gap:8px}
+.tab{padding:7px 18px;border-radius:20px;font-size:13px;font-weight:600;border:1px solid rgba(255,255,255,.1);color:var(--text2);cursor:pointer;transition:.2s;background:transparent;white-space:nowrap}
+.tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.tab:active{transform:scale(.95)}
+/* MOVIE GRID */
+.section-title{padding:16px 16px 8px;font-size:17px;font-weight:700;display:flex;align-items:center;gap:8px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:8px 16px 80px}
+@media(min-width:420px){.grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:600px){.grid{grid-template-columns:repeat(4,1fr)}}
+.movie-card{background:var(--card);border-radius:12px;overflow:hidden;cursor:pointer;transition:.2s;box-shadow:var(--shadow)}
+.movie-card:active{transform:scale(.96)}
+.movie-thumb{width:100%;aspect-ratio:2/3;object-fit:cover;display:block;background:linear-gradient(135deg,var(--card2),#2d2d6e);position:relative}
+.movie-thumb .placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:42px;font-weight:800;color:rgba(255,255,255,.3)}
+.movie-thumb .play-badge{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,.7);border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:16px;backdrop-filter:blur(4px)}
+.movie-info{padding:10px 12px 12px}
+.movie-title{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.movie-meta{font-size:11px;color:var(--text2);margin-top:3px;display:flex;gap:8px;align-items:center}
+.movie-cat{background:rgba(108,92,231,.2);color:var(--accent2);padding:1px 8px;border-radius:10px;font-size:10px}
+/* FEATURED */
+.featured{margin:4px 16px 12px;border-radius:14px;overflow:hidden;position:relative;aspect-ratio:16/7;background:linear-gradient(135deg,#1a1a4e,#2d1b69);display:flex;align-items:flex-end;cursor:pointer}
+.featured-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:60px;opacity:.15}
+.featured-info{padding:16px;position:relative;z-index:1;background:linear-gradient(0deg,rgba(0,0,0,.8),transparent)}
+.featured-title{font-size:18px;font-weight:700}
+.featured-desc{font-size:12px;color:var(--text2);margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.featured-btn{display:inline-block;margin-top:8px;background:var(--accent);color:#fff;padding:6px 20px;border-radius:20px;font-size:12px;font-weight:600;border:none;cursor:pointer}
+/* PLAYER PAGE */
+.player-page{display:none;position:fixed;inset:0;z-index:200;background:var(--bg);overflow-y:auto}
+.player-page.show{display:block}
+.player-back{position:sticky;top:0;z-index:10;padding:12px 16px;display:flex;align-items:center;gap:12px;background:linear-gradient(180deg,rgba(0,0,0,.9),transparent)}
+.player-back button{background:none;border:none;color:#fff;font-size:24px;cursor:pointer;padding:4px}
+.player-title{font-size:16px;font-weight:600;flex:1}
+.video-wrap{width:100%;aspect-ratio:16/9;background:#000}
+.video-wrap iframe,.video-wrap video{width:100%;height:100%;border:none}
+.player-details{padding:16px}
+.player-details h2{font-size:18px;margin-bottom:4px}
+.player-details p{font-size:13px;color:var(--text2);line-height:1.6}
+.related-title{padding:12px 16px 6px;font-size:15px;font-weight:600;color:var(--text2)}
+/* SEARCH */
+.search-overlay{display:none;position:fixed;inset:0;z-index:150;background:var(--bg);padding:16px}
+.search-overlay.show{display:block}
+.search-header{display:flex;gap:12px;align-items:center;margin-bottom:16px}
+.search-header input{flex:1;background:var(--card);border:1px solid rgba(255,255,255,.1);color:#fff;padding:12px 16px;border-radius:12px;font-size:15px;outline:none}
+.search-header input:focus{border-color:var(--accent)}
+.search-header button{background:none;border:none;color:#fff;font-size:20px;cursor:pointer}
+.search-results{padding-bottom:80px}
+.search-empty{text-align:center;padding:40px 16px;color:var(--text2);font-size:14px}
+/* ADMIN */
+.admin-page{display:none;position:fixed;inset:0;z-index:300;background:var(--bg);overflow-y:auto}
+.admin-page.show{display:block}
+.admin-header{position:sticky;top:0;z-index:10;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;background:var(--bg)}
+.admin-header h2{font-size:18px;display:flex;align-items:center;gap:8px}
+.admin-header button{background:none;border:none;color:#fff;font-size:20px;cursor:pointer;padding:6px}
+.admin-login{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:80vh;padding:20px}
+.admin-login h3{margin-bottom:24px;font-size:20px}
+.admin-login input{width:100%;max-width:300px;background:var(--card);border:1px solid rgba(255,255,255,.1);color:#fff;padding:14px 18px;border-radius:12px;font-size:16px;margin-bottom:12px;outline:none}
+.admin-login input:focus{border-color:var(--accent)}
+.admin-login button{background:var(--accent);color:#fff;border:none;padding:12px 40px;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer}
+.admin-login .error{color:#ff6b6b;font-size:13px;margin-bottom:12px;display:none}
+.admin-body{padding:16px 16px 80px}
+.admin-body .toolbar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.admin-body .toolbar button{background:var(--accent);color:#fff;border:none;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer}
+.admin-body .toolbar button.danger{background:#e74c3c}
+.admin-body .toolbar button.secondary{background:var(--card2)}
+.admin-movie-item{background:var(--card);border-radius:10px;padding:12px;margin-bottom:8px;display:flex;gap:12px;align-items:center}
+.admin-movie-item .thumb{width:50px;height:70px;border-radius:6px;background:linear-gradient(135deg,var(--card2),#2d2d6e);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.admin-movie-item .info{flex:1;min-width:0}
+.admin-movie-item .info .title{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.admin-movie-item .info .cat{font-size:11px;color:var(--text2)}
+.admin-movie-item .actions{display:flex;gap:6px}
+.admin-movie-item .actions button{background:none;border:none;color:#fff;padding:6px 10px;border-radius:6px;cursor:pointer;font-size:14px}
+.admin-movie-item .actions .edit{background:#3498db}
+.admin-movie-item .actions .del{background:#e74c3c}
+/* MODAL */
+.modal{display:none;position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);justify-content:center;align-items:center;padding:16px}
+.modal.show{display:flex}
+.modal-box{background:var(--card);border-radius:16px;padding:20px;width:100%;max-width:400px;max-height:90vh;overflow-y:auto}
+.modal-box h3{margin-bottom:16px;font-size:18px}
+.modal-box input,.modal-box textarea,.modal-box select{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#fff;padding:10px 14px;border-radius:10px;font-size:14px;margin-bottom:10px;outline:none;font-family:inherit}
+.modal-box input:focus,.modal-box textarea:focus,.modal-box select:focus{border-color:var(--accent)}
+.modal-box textarea{resize:vertical;min-height:60px}
+.modal-box select option{background:var(--card);color:#fff}
+.modal-box label{font-size:12px;color:var(--text2);display:block;margin-bottom:3px}
+.modal-actions{display:flex;gap:8px;margin-top:12px}
+.modal-actions button{flex:1;padding:10px;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer}
+.modal-actions .save{background:var(--accent);color:#fff}
+.modal-actions .cancel{background:rgba(255,255,255,.1);color:#fff}
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:40px 16px;color:var(--text2)}
+.empty-state .icon{font-size:48px;margin-bottom:12px}
+.empty-state p{font-size:14px}
+/* TOAST */
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--card2);color:#fff;padding:12px 24px;border-radius:12px;font-size:13px;z-index:500;opacity:0;transition:.3s;pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,.5);backdrop-filter:blur(10px)}
+.toast.show{opacity:1}
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:var(--nav);backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-around;padding:6px 0 8px;padding-bottom:calc(8px + env(safe-area-inset-bottom,0))}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;color:var(--text2);font-size:10px;cursor:pointer;padding:4px 12px;transition:.2s;position:relative}
+.nav-item .icon{font-size:22px}
+.nav-item.active{color:var(--accent)}
+.nav-item.active .icon{text-shadow:0 0 20px rgba(108,92,231,.5)}
+.nav-item:active{transform:scale(.9)}
+.offline-badge{position:absolute;top:-2px;right:4px;width:8px;height:8px;border-radius:50%;background:#2ecc71}
+.offline-badge.off{background:#e74c3c}
+/* EARN PAGE */
+.earn-page{display:none;position:fixed;inset:0;z-index:250;background:var(--bg);overflow-y:auto}
+.earn-page.show{display:block}
+.earn-header{position:sticky;top:0;z-index:10;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;background:var(--bg)}
+.earn-header h2{font-size:18px;display:flex;align-items:center;gap:8px}
+.earn-body{padding:16px 16px 100px}
+.earn-card{background:var(--card);border-radius:14px;padding:16px;margin-bottom:12px}
+.earn-card h3{font-size:15px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.earn-card p{font-size:13px;color:var(--text2);line-height:1.5}
+.earn-code{background:var(--card2);padding:12px;border-radius:10px;text-align:center;margin:10px 0;font-size:18px;font-weight:700;letter-spacing:2px;border:1px dashed var(--accent)}
+.earn-btn{background:var(--accent);color:#fff;border:none;padding:10px 24px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px;display:inline-flex;align-items:center;gap:6px}
+.earn-btn.green{background:#2ecc71}
+.earn-btn.orange{background:#e67e22}
+.earn-btn.red{background:#e74c3c}
+.earn-btn:active{transform:scale(.95)}
+.earn-progress{background:var(--card2);height:8px;border-radius:4px;margin:10px 0;overflow:hidden}
+.earn-progress-bar{height:100%;background:linear-gradient(90deg,#f1c40f,#e67e22);border-radius:4px;transition:width .3s}
+.earn-input{width:100%;background:var(--card2);border:1px solid rgba(255,255,255,.1);color:#fff;padding:10px 14px;border-radius:10px;font-size:14px;margin-top:8px;outline:none}
+.earn-input:focus{border-color:var(--accent)}
+.earn-upi{background:linear-gradient(135deg,#6c5ce7,#a29bfe);border-radius:12px;padding:20px;text-align:center;margin:10px 0}
+.earn-upi .upi-id{font-size:22px;font-weight:700;letter-spacing:1px}
+.earn-upi .upi-label{font-size:12px;opacity:.8;margin-bottom:4px}
+.earn-premium-badge{display:inline-block;background:linear-gradient(135deg,#f1c40f,#e67e22);color:#000;padding:3px 12px;border-radius:20px;font-size:11px;font-weight:700}
+.earn-ad-slot{background:var(--card2);border-radius:10px;padding:20px;text-align:center;margin:8px 0;border:1px dashed rgba(255,255,255,.1);min-height:80px;display:flex;align-items:center;justify-content:center}
+.earn-ad-slot img{max-width:100%;max-height:80px;border-radius:6px}
+.earn-sponsor{display:flex;gap:12px;align-items:center;background:var(--card2);border-radius:10px;padding:12px;margin:6px 0}
+.earn-sponsor .logo{width:44px;height:44px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.earn-sponsor .info{flex:1}
+.earn-sponsor .info .name{font-weight:600;font-size:14px}
+.earn-sponsor .info .desc{font-size:11px;color:var(--text2)}
+/* UTILITY */
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header" id="header">
+  <div class="logo"><span>🎬</span> <span>MyStream</span></div>
+  <div class="header-actions">
+    <button onclick="openSearch()" aria-label="Search">🔍</button>
+    <button onclick="openAdmin()" aria-label="Admin">⚙️</button>
+  </div>
+</div>
+
+<!-- CATEGORY TABS -->
+<div class="tabs-wrap" id="tabsWrap">
+  <div class="tabs" id="tabs"></div>
+</div>
+
+<!-- FEATURED -->
+<div class="featured" id="featured" onclick="playFeatured()">
+  <div class="featured-bg" id="featuredBg">🎬</div>
+  <div class="featured-info">
+    <div class="featured-title" id="featuredTitle">Welcome to MyStream</div>
+    <div class="featured-desc" id="featuredDesc">Apni pasand ki movies aur web series dekhein. Add karein apna content!</div>
+    <button class="featured-btn" id="featuredBtn">▶ Watch Now</button>
+  </div>
+</div>
+
+<!-- MOVIE GRID -->
+<div class="section-title" id="sectionTitle">🎥 All Movies</div>
+<div class="grid" id="movieGrid"></div>
+
+<!-- EMPTY STATE (shown when no movies) -->
+<div class="empty-state hidden" id="emptyState">
+  <div class="icon">📂</div>
+  <p>Abhi koi movie nahi hai.<br>Admin panel mein jaakar add karein!</p>
+</div>
+
+<!-- PLAYER PAGE -->
+<div class="player-page" id="playerPage">
+  <div class="player-back">
+    <button onclick="closePlayer()">←</button>
+    <div class="player-title" id="playerTitle"></div>
+  </div>
+  <div class="video-wrap" id="videoWrap"></div>
+  <div class="player-details">
+    <h2 id="playerDetailTitle"></h2>
+    <p id="playerDetailDesc"></p>
+    <div id="playerYtLink" style="margin-top:10px"></div>
+  </div>
+  <div class="related-title">🔁 Related Videos</div>
+  <div class="grid" id="relatedGrid" style="padding-bottom:100px"></div>
+</div>
+
+<!-- SEARCH OVERLAY -->
+<div class="search-overlay" id="searchOverlay">
+  <div class="search-header">
+    <input type="text" id="searchInput" placeholder="Search movies, web series..." oninput="doSearch(this.value)" autofocus>
+    <button onclick="closeSearch()">✕</button>
+  </div>
+  <div class="search-results" id="searchResults">
+    <div class="search-empty">🔍 Kuch bhi search karein...</div>
+  </div>
+</div>
+
+<!-- ADMIN PAGE -->
+<div class="admin-page" id="adminPage">
+  <div class="admin-header">
+    <h2>⚙️ Admin Panel</h2>
+    <div><button onclick="closeAdmin()">✕</button></div>
+  </div>
+  <!-- Login -->
+  <div class="admin-login" id="adminLogin">
+    <h3>🔐 Admin Login</h3>
+    <div class="error" id="loginError">Wrong password!</div>
+    <input type="password" id="passwordInput" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')adminLogin()">
+    <button onclick="adminLogin()">Login</button>
+  </div>
+  <!-- Dashboard -->
+  <div class="admin-body hidden" id="adminDashboard">
+    <div class="toolbar">
+      <button onclick="showAddModal()">➕ Add Movie</button>
+      <button class="secondary" onclick="showSettingsModal()">⚙️ Settings</button>
+      <button class="secondary" onclick="showEarnAdmin()">💰 Earn</button>
+      <button class="danger" onclick="adminLogout()">🚪 Logout</button>
+    </div>
+    <div id="adminMovieList"></div>
+  </div>
+</div>
+
+<!-- ADD/EDIT MODAL -->
+<div class="modal" id="movieModal">
+  <div class="modal-box">
+    <h3 id="modalTitle">Add Movie</h3>
+    <label>Movie Title *</label>
+    <input type="text" id="mTitle" placeholder="e.g. KGF Chapter 2">
+    <label>Category *</label>
+    <select id="mCategory"></select>
+    <label>Video * (file upload karo ya URL daalo)</label>
+    <div style="display:flex;gap:8px;margin-bottom:6px;align-items:center;flex-wrap:wrap">
+      <input type="file" id="mVideoFile" accept="video/*" style="flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#fff;padding:8px;border-radius:10px;font-size:13px">
+      <button onclick="document.getElementById('mVideoFile').value='';document.getElementById('mVideoName').classList.add('hidden')" style="background:none;border:none;color:#ff6b6b;font-size:14px;cursor:pointer">✕</button>
+    </div>
+    <div id="mVideoName" class="hidden" style="font-size:12px;color:var(--accent2);margin:-4px 0 8px 4px">📁 <span id="mVideoFileName"></span></div>
+    <label>Ya video URL (YouTube, Google Drive ya .mp4 link)</label>
+    <input type="text" id="mUrl" placeholder="https://youtube.com/... ya https://drive.google.com/... ya https://...mp4">
+    <div style="font-size:11px;color:var(--text2);margin:-6px 0 10px 4px">💡 Google Drive, OneDrive, Dropbox, Terabox, Mega — sab ka link daal sakte ho!</div>
+    <label>Thumbnail (photo upload karo ya URL daalo)</label>
+    <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center;flex-wrap:wrap">
+      <input type="file" id="mThumbFile" accept="image/*" style="flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#fff;padding:8px;border-radius:10px;font-size:13px">
+      <button onclick="document.getElementById('mThumbFile').value='';document.getElementById('mThumbPreview').classList.add('hidden');document.getElementById('mThumbUrl').value=''" style="background:none;border:none;color:#ff6b6b;font-size:18px;cursor:pointer">✕</button>
+    </div>
+    <div id="mThumbPreview" class="hidden" style="margin-bottom:10px;border-radius:8px;overflow:hidden;width:100px;height:140px;background:var(--card2);display:flex;align-items:center;justify-content:center">
+      <img id="mThumbPreviewImg" style="width:100%;height:100%;object-fit:cover">
+    </div>
+    <label>Ya thumbnail URL (optional)</label>
+    <input type="text" id="mThumbUrl" placeholder="https://example.com/poster.jpg">
+    <label>Description (optional)</label>
+    <textarea id="mDesc" placeholder="Movie ke baare mein kuch likhein..."></textarea>
+    <div class="modal-actions">
+      <button class="save" id="modalSaveBtn" onclick="saveMovie()">💾 Save</button>
+      <button class="cancel" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal" id="settingsModal">
+  <div class="modal-box">
+    <h3>⚙️ Settings</h3>
+    <label>App Name</label>
+    <input type="text" id="sAppName" placeholder="MyStream">
+    <label>Admin Password</label>
+    <input type="text" id="sPassword" placeholder="Change admin password">
+    <label>Categories (comma separated)</label>
+    <input type="text" id="sCategories" placeholder="Movies, Web Series, Kids, Sports">
+    <div class="modal-actions">
+      <button class="save" onclick="saveSettings()">💾 Save</button>
+      <button class="cancel" onclick="closeSettingsModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- EARN PAGE -->
+<div class="earn-page" id="earnPage">
+  <div class="earn-header">
+    <h2>💰 Earn Money</h2>
+    <div><button onclick="closeEarn()" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer">✕</button></div>
+  </div>
+  <div class="earn-body" id="earnBody"></div>
+</div>
+
+<!-- EARN ADMIN MODAL -->
+<div class="modal" id="earnAdminModal">
+  <div class="modal-box">
+    <h3>💰 Earn Management</h3>
+    <label>🎯 Premium User Toggle</label>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <button class="earn-btn green" onclick="adminTogglePremium(true)" style="flex:1;margin:0">✅ Activate Premium</button>
+      <button class="earn-btn red" onclick="adminTogglePremium(false)" style="flex:1;margin:0">❌ Remove Premium</button>
+    </div>
+    <label>📢 Ad Banner Image URL</label>
+    <input type="text" id="eAdImg" class="earn-input" placeholder="https://example.com/ad-banner.jpg" style="margin-top:4px">
+    <div class="modal-actions" style="margin-top:6px">
+      <button class="earn-btn" onclick="adminSetAd()" style="margin:0">✅ Set Ad</button>
+    </div>
+    <label style="margin-top:12px">🤝 Sponsor Name</label>
+    <input type="text" id="eSponsorName" class="earn-input" placeholder="Sponsor name" style="margin-top:4px">
+    <input type="text" id="eSponsorDesc" class="earn-input" placeholder="Sponsor description">
+    <div class="modal-actions" style="margin-top:6px">
+      <button class="earn-btn green" onclick="adminAddSponsor()" style="margin:0">➕ Add Sponsor</button>
+    </div>
+    <label style="margin-top:12px">📊 Stats</label>
+    <p style="font-size:13px;color:var(--text2)" id="eStats"></p>
+    <div class="modal-actions">
+      <button class="cancel" onclick="closeEarnAdminModal()" style="flex:1">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <button class="nav-item active" onclick="showHome()" id="navHome">
+    <span class="icon">🏠</span> Home
+  </button>
+  <button class="nav-item" onclick="openSearch()" id="navSearch">
+    <span class="icon">🔍</span> Search
+  </button>
+  <button class="nav-item" onclick="openAdmin()" id="navAdmin">
+    <span class="icon">⚙️</span> Admin
+  </button>
+  <button class="nav-item" onclick="openEarn()" id="navEarn">
+    <span class="icon">💰</span> Earn
+  </button>
+</div>
+
+<script>
+// ========== DATA ==========
+const DEFAULTS = {
+  movies: [
+    {id:1,title:"Sample Movie 1",category:"Movies",url:"https://www.youtube.com/embed/dQw4w9WgXcQ",thumb:"",desc:"Yeh ek sample movie hai. Admin panel mein jaakar apni movies add karein!",type:"youtube",youtubeUrl:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
+    {id:2,title:"Sample Web Series",category:"Web Series",url:"https://www.youtube.com/embed/jNQXAC9IVRw",thumb:"",desc:"Sample web series description.",type:"youtube",youtubeUrl:"https://www.youtube.com/watch?v=jNQXAC9IVRw"},
+    {id:3,title:"Sample Kids Show",category:"Kids",url:"https://www.youtube.com/embed/77V_n6HpCbA",thumb:"",desc:"Sample kids content.",type:"youtube",youtubeUrl:"https://www.youtube.com/watch?v=77V_n6HpCbA"}
+  ],
+  categories: ["Movies","Web Series","Kids","Sports","Live TV"],
+  password: "movie123",
+  appName: "MyStream",
+  featuredId: 1,
+  // Earn features
+  referralCode: "MYSTREAM" + Math.random().toString(36).substring(2,6).toUpperCase(),
+  totalReferrals: 0,
+  rewardsClaimed: 0,
+  premium: false,
+  premiumExpiry: null,
+  ads: [{id:1,img:"",link:"",active:true}],
+  sponsors: [{id:1,name:"Your Brand Here",logo:"",desc:"Sponsor banne ke liye sampark karein"}]
+};
+
+function getData(){
+  let raw = localStorage.getItem('movie_dekho_data');
+  if(!raw){
+    localStorage.setItem('movie_dekho_data',JSON.stringify(DEFAULTS));
+    return JSON.parse(JSON.stringify(DEFAULTS));
+  }
+  return JSON.parse(raw);
+}
+
+function saveData(d){
+  localStorage.setItem('movie_dekho_data',JSON.stringify(d));
+}
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// ========== INDEXED DB — Video File Storage ==========
+function openVideoDB(){
+  return new Promise((resolve,reject)=>{
+    const req=indexedDB.open('MyStreamVideos',1);
+    req.onupgradeneeded=e=>{
+      if(!e.target.result.objectStoreNames.contains('videos'))
+        e.target.result.createObjectStore('videos',{keyPath:'id'});
+    };
+    req.onsuccess=e=>resolve(e.target.result);
+    req.onerror=e=>reject(e.target.error);
+  });
+}
+
+function storeVideoFile(id,file){
+  return openVideoDB().then(db=>new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onerror=()=>reject('File read error');
+    reader.onload=e=>{
+      const tx=db.transaction('videos','readwrite');
+      tx.objectStore('videos').put({id,data:e.target.result,type:file.type||'video/mp4',name:file.name});
+      tx.oncomplete=()=>resolve();
+      tx.onerror=e=>reject(e.target.error);
+    };
+    reader.readAsArrayBuffer(file);
+  }));
+}
+
+function getVideoURL(id){
+  return openVideoDB().then(db=>new Promise((resolve,reject)=>{
+    const tx=db.transaction('videos','readonly');
+    const req=tx.objectStore('videos').get(id);
+    req.onsuccess=e=>{
+      const entry=e.target.result;
+      if(!entry){resolve(null);return;}
+      const blob=new Blob([entry.data],{type:entry.type||'video/mp4'});
+      resolve(URL.createObjectURL(blob));
+    };
+    req.onerror=e=>reject(e.target.error);
+  }));
+}
+
+function deleteVideoFile(id){
+  return openVideoDB().then(db=>new Promise((resolve,reject)=>{
+    const tx=db.transaction('videos','readwrite');
+    tx.objectStore('videos').delete(id);
+    tx.oncomplete=()=>resolve();
+    tx.onerror=e=>reject(e.target.error);
+  }));
+}
+
+// ========== ROUTING ==========
+let currentTab = 'All';
+
+function showHome(){
+  document.getElementById('searchOverlay').classList.remove('show');
+  document.getElementById('playerPage').classList.remove('show');
+  document.getElementById('adminPage').classList.remove('show');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('navHome').classList.add('active');
+  document.getElementById('videoWrap').innerHTML='';
+  renderHome();
+}
+
+function renderHome(){
+  const d = getData();
+  // Header
+  document.getElementById('header').style.display='flex';
+  document.getElementById('tabsWrap').style.display='block';
+  // Featured
+  const feat = document.getElementById('featured');
+  if(d.movies.length>0){
+    feat.style.display='flex';
+    const f = d.movies.find(m=>m.id===d.featuredId)||d.movies[0];
+    document.getElementById('featuredTitle').textContent=f.title;
+    document.getElementById('featuredDesc').textContent=f.desc||'Watch now!';
+  } else {
+    feat.style.display='none';
+  }
+  // Tabs
+  const tabsEl = document.getElementById('tabs');
+  tabsEl.innerHTML = '<button class="tab active" data-tab="All" onclick="switchTab(\'All\')">🏁 All</button>';
+  d.categories.forEach(c=>{
+    tabsEl.innerHTML += `<button class="tab" data-tab="${c}" onclick="switchTab('${c}')">${c}</button>`;
+  });
+  // Grid
+  renderGrid(d);
+}
+
+function switchTab(tab){
+  currentTab=tab;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));
+  renderGrid(getData());
+}
+
+function renderGrid(d){
+  const grid=document.getElementById('movieGrid');
+  const empty=document.getElementById('emptyState');
+  let movies = d.movies;
+  if(currentTab!=='All') movies=movies.filter(m=>m.category===currentTab);
+  document.getElementById('sectionTitle').textContent=
+    currentTab==='All'?'🎥 All Movies':`📁 ${currentTab}`;
+  if(movies.length===0){
+    grid.innerHTML='';
+    empty.classList.remove('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+  grid.innerHTML=movies.map(m=>`
+    <div class="movie-card" onclick="playMovie(${m.id})">
+      <div class="movie-thumb">
+        ${m.thumb
+          ? `<img src="${m.thumb}" alt="${m.title}" style="width:100%;height:100%;object-fit:cover" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="placeholder" style="display:none">${m.title[0]}</div>`
+          : `<div class="placeholder">${m.title[0]||'🎬'}</div>`
+        }
+        <div class="play-badge">▶</div>
+      </div>
+      <div class="movie-info">
+        <div class="movie-title">${m.title}</div>
+        <div class="movie-meta">
+          <span class="movie-cat">${m.category}</span>
+          <span>${m.type==='youtube'?'📺 YouTube':m.type==='google-drive'?'☁️ Drive':m.type==='embed'?'🌐 Web':m.type==='local'?'📁 File':'🎞️ Direct'}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ========== PLAYER ==========
+function playMovie(id){
+  const d=getData();
+  const m=d.movies.find(x=>x.id===id);
+  if(!m){toast('Movie not found!');return}
+  document.getElementById('playerPage').classList.add('show');
+  document.getElementById('header').style.display='none';
+  document.getElementById('tabsWrap').style.display='none';
+  document.getElementById('featured').style.display='none';
+  document.getElementById('playerTitle').textContent=m.title;
+  document.getElementById('playerDetailTitle').textContent=m.title;
+  document.getElementById('playerDetailDesc').textContent=m.desc||'No description';
+
+  // YouTube link button (for embed errors)
+  const ytLink=document.getElementById('playerYtLink');
+  if(m.type==='youtube' && m.youtubeUrl){
+    ytLink.innerHTML=`<a href="${m.youtubeUrl}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:#ff0000;color:#fff;padding:10px 20px;border-radius:10px;text-decoration:none;font-size:14px;font-weight:600">▶️ Watch on YouTube</a> <span style="font-size:12px;color:var(--text2);margin-left:8px">Agar embed error aaye toh</span>`;
+  } else {
+    ytLink.innerHTML='';
+  }
+
+  const wrap=document.getElementById('videoWrap');
+  if(m.type==='youtube'){
+    wrap.innerHTML=`<iframe src="${m.url}?autoplay=1&rel=0" allow="autoplay;encrypted-media" allowfullscreen></iframe>`;
+  } else if(m.type==='google-drive'){
+    wrap.innerHTML=`<iframe src="${m.url}" allow="autoplay" allowfullscreen></iframe>`;
+  } else if(m.type==='embed'){
+    wrap.innerHTML=`<iframe src="${m.url}" allow="autoplay" allowfullscreen style="width:100%;height:100%;border:none"></iframe>`;
+  } else if(m.url && m.url.startsWith('local:')){
+    // Local video file from IndexedDB
+    const vid=m.url.replace('local:','');
+    wrap.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text2);font-size:14px">⏳ Loading video...</div>`;
+    getVideoURL(vid).then(blobUrl=>{
+      if(blobUrl){
+        wrap.innerHTML=`<video src="${blobUrl}" controls autoplay style="width:100%;height:100%"></video>`;
+      } else {
+        wrap.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#ff6b6b;font-size:14px">❌ Video file not found. Upload again.</div>`;
+      }
+    });
+  } else {
+    wrap.innerHTML=`<video src="${m.url}" controls autoplay style="width:100%;height:100%"></video>`;
+  }
+  // Related
+  const related=d.movies.filter(x=>x.id!==id&&(x.category===m.category||true)).slice(0,4);
+  document.getElementById('relatedGrid').innerHTML=related.map(x=>`
+    <div class="movie-card" onclick="playMovie(${x.id})">
+      <div class="movie-thumb">
+        ${x.thumb?`<img src="${x.thumb}" alt="${x.title}" style="width:100%;height:100%;object-fit:cover" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="placeholder" style="display:none">${x.title[0]}</div>`
+          :`<div class="placeholder">${x.title[0]||'🎬'}</div>`}
+        <div class="play-badge">▶</div>
+      </div>
+      <div class="movie-info">
+        <div class="movie-title">${x.title}</div>
+        <div class="movie-meta"><span class="movie-cat">${x.category}</span></div>
+      </div>
+    </div>
+  `).join('')||'<div class="empty-state"><p>No related videos</p></div>';
+  d.featuredId=id;
+  saveData(d);
+}
+
+function playFeatured(){
+  const d=getData();
+  if(d.movies.length>0){
+    const f=d.movies.find(m=>m.id===d.featuredId)||d.movies[0];
+    playMovie(f.id);
+  } else {
+    toast('Pehle koi movie add karein!');
+  }
+}
+
+function closePlayer(){
+  document.getElementById('playerPage').classList.remove('show');
+  document.getElementById('videoWrap').innerHTML='';
+  document.getElementById('playerYtLink').innerHTML='';
+  document.getElementById('header').style.display='flex';
+  document.getElementById('tabsWrap').style.display='block';
+  document.getElementById('featured').style.display='flex';
+  renderHome();
+}
+
+// ========== SEARCH ==========
+function openSearch(){
+  document.getElementById('searchOverlay').classList.add('show');
+  document.getElementById('searchInput').value='';
+  document.getElementById('searchInput').focus();
+  document.getElementById('searchResults').innerHTML='<div class="search-empty">🔍 Kuch bhi search karein...</div>';
+}
+function closeSearch(){
+  document.getElementById('searchOverlay').classList.remove('show');
+}
+function doSearch(q){
+  const d=getData();
+  const res=document.getElementById('searchResults');
+  if(!q.trim()){
+    res.innerHTML='<div class="search-empty">🔍 Kuch bhi search karein...</div>';
+    return;
+  }
+  const ql=q.toLowerCase();
+  const matches=d.movies.filter(m=>
+    m.title.toLowerCase().includes(ql)||
+    (m.desc||'').toLowerCase().includes(ql)||
+    m.category.toLowerCase().includes(ql)
+  );
+  if(matches.length===0){
+    res.innerHTML='<div class="search-empty">😕 Koi result nahi mila</div>';
+    return;
+  }
+  res.innerHTML=matches.map(m=>`
+    <div class="movie-card" style="margin-bottom:12px" onclick="closeSearch();playMovie(${m.id})">
+      <div class="movie-thumb">
+        ${m.thumb?`<img src="${m.thumb}" alt="${m.title}" style="width:100%;height:100%;object-fit:cover" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="placeholder" style="display:none">${m.title[0]}</div>`
+          :`<div class="placeholder">${m.title[0]||'🎬'}</div>`}
+        <div class="play-badge">▶</div>
+      </div>
+      <div class="movie-info">
+        <div class="movie-title">${m.title}</div>
+        <div class="movie-meta">
+          <span class="movie-cat">${m.category}</span>
+          <span>${m.type==='youtube'?'📺 YouTube':m.type==='google-drive'?'☁️ Drive':m.type==='embed'?'🌐 Web':m.type==='local'?'📁 File':'🎞️ Direct'}</span>
+        </div>
+    </div>
+  `).join('');
+}
+
+// ========== ADMIN ==========
+let adminLoggedIn = false;
+
+function openAdmin(){
+  document.getElementById('adminPage').classList.add('show');
+  document.getElementById('adminLogin').style.display='flex';
+  document.getElementById('adminDashboard').classList.add('hidden');
+  adminLoggedIn=false;
+  document.getElementById('passwordInput').value='';
+  document.getElementById('loginError').style.display='none';
+}
+
+function closeAdmin(){
+  document.getElementById('adminPage').classList.remove('show');
+  adminLoggedIn=false;
+}
+
+function adminLogin(){
+  const d=getData();
+  const pwd=document.getElementById('passwordInput').value;
+  if(pwd===d.password){
+    adminLoggedIn=true;
+    document.getElementById('adminLogin').style.display='none';
+    document.getElementById('adminDashboard').classList.remove('hidden');
+    renderAdminList();
+  } else {
+    document.getElementById('loginError').style.display='block';
+  }
+}
+
+function adminLogout(){
+  adminLoggedIn=false;
+  document.getElementById('adminLogin').style.display='flex';
+  document.getElementById('adminDashboard').classList.add('hidden');
+}
+
+function renderAdminList(){
+  const d=getData();
+  const el=document.getElementById('adminMovieList');
+  if(d.movies.length===0){
+    el.innerHTML='<div class="empty-state" style="padding:20px 0"><p>No movies yet. Add your first movie!</p></div>';
+    return;
+  }
+  el.innerHTML=d.movies.map(m=>`
+    <div class="admin-movie-item">
+      <div class="thumb">${m.thumb?'<span style="font-size:10px">📺</span>':m.title[0]||'🎬'}</div>
+      <div class="info">
+        <div class="title">${m.title}</div>
+        <div class="cat">${m.category} · ${m.type==='youtube'?'📺 YouTube':m.type==='google-drive'?'☁️ Drive':m.type==='embed'?'🌐 Web':m.type==='local'?'📁 File':'🎞️ Direct'}</div>
+      </div>
+      <div class="actions">
+        <button class="edit" onclick="editMovie(${m.id})">✏️</button>
+        <button class="del" onclick="deleteMovie(${m.id})">🗑️</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ========== ADD/EDIT MOVIE ==========
+let editingId = null;
+
+// Thumbnail file upload preview
+document.addEventListener('DOMContentLoaded', function(){
+  const thumbInput = document.getElementById('mThumbFile');
+  if(thumbInput){
+    thumbInput.addEventListener('change', function(e){
+      const file = e.target.files[0];
+      if(file){
+        const reader = new FileReader();
+        reader.onload = function(ev){
+          document.getElementById('mThumbPreviewImg').src = ev.target.result;
+          document.getElementById('mThumbPreview').classList.remove('hidden');
+          document.getElementById('mThumbUrl').value = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+  // Video file select — show file name
+  const videoInput = document.getElementById('mVideoFile');
+  if(videoInput){
+    videoInput.addEventListener('change', function(e){
+      const file = e.target.files[0];
+      if(file){
+        document.getElementById('mVideoFileName').textContent = file.name + ' (' + Math.round(file.size/1024/1024) + 'MB)';
+        document.getElementById('mVideoName').classList.remove('hidden');
+      }
+    });
+  }
+});
+
+function showAddModal(){
+  editingId=null;
+  document.getElementById('modalTitle').textContent='➕ Add Movie';
+  document.getElementById('modalSaveBtn').textContent='💾 Add Movie';
+  document.getElementById('mTitle').value='';
+  document.getElementById('mUrl').value='';
+  document.getElementById('mVideoFile').value='';
+  document.getElementById('mVideoName').classList.add('hidden');
+  document.getElementById('mThumbFile').value='';
+  document.getElementById('mThumbUrl').value='';
+  document.getElementById('mThumbPreview').classList.add('hidden');
+  document.getElementById('mDesc').value='';
+  // Populate categories
+  const d=getData();
+  const sel=document.getElementById('mCategory');
+  sel.innerHTML=d.categories.map(c=>`<option value="${c}">${c}</option>`).join('');
+  document.getElementById('movieModal').classList.add('show');
+}
+
+function editMovie(id){
+  const d=getData();
+  const m=d.movies.find(x=>x.id===id);
+  if(!m) return;
+  editingId=id;
+  document.getElementById('modalTitle').textContent='✏️ Edit Movie';
+  document.getElementById('modalSaveBtn').textContent='💾 Update';
+  document.getElementById('mTitle').value=m.title;
+  document.getElementById('mUrl').value=m.url&&m.url.startsWith('local:')?'':m.url||'';
+  document.getElementById('mVideoFile').value='';
+  document.getElementById('mVideoName').classList.remove('hidden');
+  document.getElementById('mVideoFileName').textContent=m.url&&m.url.startsWith('local:')?'📁 Uploaded video file':'Select new file to replace';
+  document.getElementById('mThumbFile').value='';
+  document.getElementById('mThumbUrl').value=m.thumb||'';
+  if(m.thumb && m.thumb.startsWith('data:')){
+    document.getElementById('mThumbPreviewImg').src=m.thumb;
+    document.getElementById('mThumbPreview').classList.remove('hidden');
+  } else {
+    document.getElementById('mThumbPreview').classList.add('hidden');
+  }
+  document.getElementById('mDesc').value=m.desc||'';
+  const sel=document.getElementById('mCategory');
+  sel.innerHTML=d.categories.map(c=>`<option value="${c}" ${c===m.category?'selected':''}>${c}</option>`).join('');
+  document.getElementById('movieModal').classList.add('show');
+}
+
+function saveMovie(){
+  const title=document.getElementById('mTitle').value.trim();
+  const cat=document.getElementById('mCategory').value;
+  const url=document.getElementById('mUrl').value.trim();
+  const thumb=document.getElementById('mThumbUrl').value.trim();
+  const desc=document.getElementById('mDesc').value.trim();
+  const videoFile=document.getElementById('mVideoFile').files[0];
+  const d=getData();
+  // If editing and no new file/URL, keep existing
+  if(editingId && !videoFile && !url.trim()){
+    const existing=d.movies.find(x=>x.id===editingId);
+    if(existing && existing.url){url=existing.url;}
+  }
+  if(!title||(!url&&!videoFile)){toast('Title aur video (file ya URL) required hai!');return}
+  // Generate ID
+  const maxId=d.movies.reduce((mx,m)=>Math.max(mx,m.id||0),0);
+  const newId=editingId||maxId+1;
+  if(!editingId) editingId=newId;
+
+  // Handle video file upload
+  if(videoFile){
+    storeVideoFile('video_'+newId,videoFile).then(()=>{
+      finishSaveMovie(title,cat,'local:video_'+newId,thumb,desc,newId,d);
+    }).catch(()=>{
+      toast('Video upload failed! ❌');
+    });
+  } else {
+    detectAndSaveURL(title,cat,url,thumb,desc,newId,d);
+  }
+}
+
+function detectAndSaveURL(title,cat,url,thumb,desc,id,d){
+  const lower=url.toLowerCase();
+  // Direct video file link (.mp4 .webm .mkv .avi .mov)
+  if(lower.match(/\.(mp4|webm|mkv|avi|mov)(\?|$)/)){
+    finishSaveMovie(title,cat,url,thumb,desc,id,d,'direct');
+    return;
+  }
+  // YouTube
+  if(lower.includes('youtube.com')||lower.includes('youtu.be')){
+    let vid='';
+    let origUrl=url;
+    const m1=url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    if(m1) vid=m1[1];
+    else if(url.includes('youtube.com/embed/')) vid=url.split('youtube.com/embed/')[1].split('?')[0];
+    if(vid){
+      finishSaveMovie(title,cat,`https://www.youtube.com/embed/${vid}`,thumb,desc,id,d,'youtube',`https://www.youtube.com/watch?v=${vid}`);
+      return;
+    }
+  }
+  // Google Drive
+  if(lower.includes('drive.google.com')){
+    let fid='';
+    const gdMatch=url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+    if(gdMatch) fid=gdMatch[1];
+    if(fid){
+      finishSaveMovie(title,cat,`https://drive.google.com/file/d/${fid}/preview`,thumb,desc,id,d,'google-drive');
+      return;
+    }
+  }
+  // OneDrive
+  if(lower.includes('onedrive.live.com')||lower.includes('1drv.ms')){
+    finishSaveMovie(title,cat,url,thumb,desc,id,d,'embed');
+    return;
+  }
+  // Dropbox — convert dl=0 to dl=1 for direct video
+  if(lower.includes('dropbox.com')){
+    let dbUrl=url.replace('dl=0','dl=1');
+    finishSaveMovie(title,cat,dbUrl,thumb,desc,id,d,'direct');
+    return;
+  }
+  // Terabox, Mega, others — try embed (web player if available)
+  finishSaveMovie(title,cat,url,thumb,desc,id,d,'embed');
+}
+
+function finishSaveMovie(title,cat,url,thumb,desc,id,d,type,youtubeUrl){
+  type=type||'local';
+  const movie={id,title,category:cat,url,thumb,desc,type};
+  if(youtubeUrl) movie.youtubeUrl=youtubeUrl;
+  const existingIdx=d.movies.findIndex(x=>x.id===id);
+  if(existingIdx>=0){
+    d.movies[existingIdx]=movie;
+    toast('Movie updated! ✅');
+  } else {
+    d.movies.push(movie);
+    toast('Movie added! ✅');
+  }
+  saveData(d);
+  closeModal();
+  renderAdminList();
+  renderHome();
+}
+
+function deleteMovie(id){
+  if(!confirm('Delete this movie?')) return;
+  const d=getData();
+  const m=d.movies.find(x=>x.id===id);
+  if(m && m.url && m.url.startsWith('local:')){
+    deleteVideoFile(m.url.replace('local:','')).catch(()=>{});
+  }
+  d.movies=d.movies.filter(m=>m.id!==id);
+  if(d.featuredId===id) d.featuredId=d.movies.length>0?d.movies[0].id:null;
+  saveData(d);
+  renderAdminList();
+  renderHome();
+  toast('Movie deleted 🗑️');
+}
+
+function closeModal(){
+  document.getElementById('movieModal').classList.remove('show');
+}
+
+// ========== SETTINGS ==========
+function showSettingsModal(){
+  const d=getData();
+  document.getElementById('sAppName').value=d.appName||'MyStream';
+  document.getElementById('sPassword').value='';
+  document.getElementById('sCategories').value=(d.categories||[]).join(', ');
+  document.getElementById('settingsModal').classList.add('show');
+}
+
+function closeSettingsModal(){
+  document.getElementById('settingsModal').classList.remove('show');
+}
+
+function saveSettings(){
+  const d=getData();
+  const an=document.getElementById('sAppName').value.trim();
+  const pw=document.getElementById('sPassword').value.trim();
+  const cats=document.getElementById('sCategories').value.split(',').map(c=>c.trim()).filter(Boolean);
+  if(an) d.appName=an;
+  if(pw) d.password=pw;
+  if(cats.length>0) d.categories=cats;
+  saveData(d);
+  // Update header
+  document.querySelector('.logo').innerHTML=`<span>🎬</span> <span>${d.appName}</span>`;
+  closeSettingsModal();
+  renderHome();
+  toast('Settings saved! ✅');
+}
+
+// ========== EARN / MONEY FEATURES ==========
+function openEarn(){
+  document.getElementById('earnPage').classList.add('show');
+  document.getElementById('header').style.display='none';
+  document.getElementById('tabsWrap').style.display='none';
+  document.getElementById('featured').style.display='none';
+  renderEarn();
+}
+function closeEarn(){
+  document.getElementById('earnPage').classList.remove('show');
+  document.getElementById('header').style.display='flex';
+  document.getElementById('tabsWrap').style.display='block';
+  document.getElementById('featured').style.display='flex';
+}
+function renderEarn(){
+  const d=getData();
+  const refCode=d.referralCode||'MYSTREAM';
+  const refs=d.totalReferrals||0;
+  const claimed=d.rewardsClaimed||0;
+  const canClaim=Math.floor(refs/3)-claimed;
+  const pct=Math.min(100,(refs%3)/3*100);
+  const premium=d.premium;
+  const ads=d.ads||[];
+  const sponsors=d.sponsors||[];
+  let html=`
+    <!-- 1. REFER & EARN -->
+    <div class="earn-card">
+      <h3>🔗 Refer & Earn ₹50</h3>
+      <p>3 logo ko refer karo aur ₹50 paao! Jaise hi 3 referral complete, claim karo.</p>
+      <div class="earn-code" id="refCodeDisplay">${refCode}</div>
+      <button class="earn-btn" onclick="shareReferral()">📋 Copy & Share Code</button>
+      <div style="margin-top:12px">
+        <div style="display:flex;justify-content:space-between;font-size:12px">
+          <span>Referrals: <strong>${refs}</strong></span>
+          <span>Claimed: <strong>₹${claimed*50}</strong></span>
+        </div>
+        <div class="earn-progress">
+          <div class="earn-progress-bar" style="width:${pct}%"></div>
+        </div>
+        <div style="font-size:11px;color:var(--text2)">${3-(refs%3)} referral baki agle ₹50 ke liye</div>
+      </div>
+      ${canClaim>0?`<button class="earn-btn green" onclick="claimReward()">🎉 Claim ₹50 (${canClaim} available)</button>`:''}
+      <hr style="border:none;border-top:1px solid rgba(255,255,255,.05);margin:12px 0">
+      <p style="font-size:12px;color:var(--text2)">Kisi ka referral code hai? Yahan daalo 👇</p>
+      <input class="earn-input" id="referralInput" placeholder="Referral code enter karein" style="margin-bottom:6px">
+      <button class="earn-btn orange" onclick="useReferral()">✅ Submit Referral</button>
+    </div>
+
+    <!-- 2. DONATE / SUPPORT -->
+    <div class="earn-card">
+      <h3>💜 Support Us</h3>
+      <p>Agar aapko app pasand hai toh hume support karein. Chhoti si madad bhi kaam aati hai!</p>
+      <div class="earn-upi">
+        <div class="upi-label">Scan ya UPI se karein</div>
+        <div class="upi-id">bgmitornament@ibl</div>
+        <button class="earn-btn" onclick="donateUPI()" style="margin-top:12px">💳 Pay via UPI</button>
+      </div>
+    </div>
+
+    <!-- 3. PREMIUM -->
+    <div class="earn-card">
+      <h3>⭐ Premium Membership</h3>
+      <p>Premium members ko special badge aur exclusive content milega!</p>
+      <div style="margin:10px 0;text-align:center;padding:16px;background:var(--card2);border-radius:10px">
+        ${premium?`
+          <div class="earn-premium-badge">⭐ PREMIUM USER</div>
+          <p style="margin-top:8px;font-size:13px;color:#2ecc71">✅ Aap premium member hain!</p>
+        `:`
+          <div style="font-size:40px;margin-bottom:8px">⭐</div>
+          <p style="font-size:13px">₹49/month — Ad-free, exclusive content</p>
+          <button class="earn-btn green" onclick="buyPremium()">🌟 Become Premium</button>
+        `}
+      </div>
+    </div>
+
+    <!-- 4. AD BANNERS -->
+    <div class="earn-card">
+      <h3>📢 Advertise Here</h3>
+      <p>Apne business ka ad lagayein. Hajarom viewers tak pahuchein!</p>
+      ${ads.map(a=>`
+        <div class="earn-ad-slot">
+          ${a.img?`<img src="${a.img}" alt="Ad">`:'<span style="color:var(--text2);font-size:12px">📢 Ad Slot Available — ₹500/month<br><small style="font-size:10px">Owner se contact karein</small></span>'}
+        </div>
+      `).join('')}
+      <p style="font-size:11px;color:var(--text2);margin-top:6px">📞 Ads ke liye: bgmitornament@ibl ya admin se baat karein</p>
+    </div>
+
+    <!-- 5. SPONSORS -->
+    <div class="earn-card">
+      <h3>🤝 Our Sponsors</h3>
+      ${sponsors.map(s=>`
+        <div class="earn-sponsor">
+          <div class="logo">${s.logo||'🤝'}</div>
+          <div class="info">
+            <div class="name">${s.name}</div>
+            <div class="desc">${s.desc}</div>
+          </div>
+        </div>
+      `).join('')}
+      <p style="font-size:11px;color:var(--text2);margin-top:8px">💼 Sponsor banne ke liye sampark karein</p>
+    </div>
+  `;
+  document.getElementById('earnBody').innerHTML=html;
+}
+function shareReferral(){
+  const d=getData();
+  const code=d.referralCode;
+  const site='https://raj86017-cmd.github.io/mystream/';
+  const msg=`🎬 MyStream - Free movies & web series!\n\nMera referral code use karo: ${code}\nWebsite: ${site}\n\n3 referral complete karne par ₹50 milega!`;
+  if(navigator.share){
+    navigator.share({title:'MyStream Referral',text:msg}).catch(()=>{});
+  } else {
+    navigator.clipboard.writeText(code).then(()=>{
+      toast('Referral code copied! 📋 Ab kisi ko bhejo');
+    }).catch(()=>{
+      prompt('Copy karo:',code);
+    });
+  }
+}
+function useReferral(){
+  const input=document.getElementById('referralInput');
+  const code=input.value.trim().toUpperCase();
+  if(!code){toast('Koi referral code daalo!');return;}
+  if(code.length<4){toast('Code galat hai! ❌');return;}
+  const d=getData();
+  // Record this as a referral for the code owner
+  if(typeof d.referralsTracked==='undefined') d.referralsTracked=[];
+  const lsKey='mystream_referred_'+code;
+  if(localStorage.getItem(lsKey)){toast('Aap pehle hi refer ho chuke ho!');return;}
+  d.totalReferrals=(d.totalReferrals||0)+1;
+  localStorage.setItem(lsKey,'1');
+  if(typeof d.referralsTracked==='undefined') d.referralsTracked=[];
+  d.referralsTracked.push({code,time:Date.now()});
+  saveData(d);
+  input.value='';
+  toast('✅ Referral registered! Thanks!');
+  renderEarn();
+}
+function claimReward(){
+  const d=getData();
+  const refs=d.totalReferrals||0;
+  const claimed=d.rewardsClaimed||0;
+  const canClaim=Math.floor(refs/3)-claimed;
+  if(canClaim<=0){toast('Pehle 3 referrals complete karo!');return;}
+  d.rewardsClaimed=(d.rewardsClaimed||0)+1;
+  saveData(d);
+  // Open UPI for ₹50 payout
+  const upi=`upi://pay?pa=bgmitornament@ibl&pn=MyStreamReward&am=50&cu=INR&tn=Referral Reward ₹50`;
+  window.location.href=upi;
+  toast('🎉 Claim submitted! UPI se ₹50 bhej rahe hain...');
+  renderEarn();
+}
+function donateUPI(){
+  const amt=prompt('Kitna donate karna chahte ho? (₹)', '50');
+  if(!amt||isNaN(amt)||amt<=0) return;
+  const upi=`upi://pay?pa=bgmitornament@ibl&pn=MyStream&am=${amt}&cu=INR&tn=Support MyStream`;
+  window.location.href=upi;
+}
+function buyPremium(){
+  const upi=`upi://pay?pa=bgmitornament@ibl&pn=MyStreamPremium&am=49&cu=INR&tn=Premium Membership ₹49`;
+  window.location.href=upi;
+  toast('🌟 UPI se ₹49 bhejein. Admin approve karega!');
+}
+function showEarnAdmin(){
+  document.getElementById('earnAdminModal').classList.add('show');
+  const d=getData();
+  document.getElementById('eStats').textContent=`Referrals: ${d.totalReferrals||0} | Rewards Claimed: ${d.rewardsClaimed||0} | Premium: ${d.premium?'Yes':'No'} | Ads: ${(d.ads||[]).length} | Sponsors: ${(d.sponsors||[]).length}`;
+  document.getElementById('eAdImg').value=(d.ads&&d.ads[0]&&d.ads[0].img)||'';
+}
+function closeEarnAdminModal(){
+  document.getElementById('earnAdminModal').classList.remove('show');
+}
+function adminTogglePremium(val){
+  const d=getData();
+  d.premium=val;
+  d.premiumExpiry=val?Date.now()+30*24*60*60*1000:null;
+  saveData(d);
+  toast(val?'✅ Premium activated!':'❌ Premium removed');
+  closeEarnAdminModal();
+}
+function adminSetAd(){
+  const img=document.getElementById('eAdImg').value.trim();
+  const d=getData();
+  if(!d.ads||d.ads.length===0) d.ads=[{id:1,img:'',link:'',active:true}];
+  d.ads[0].img=img;
+  d.ads[0].active=true;
+  saveData(d);
+  toast('✅ Ad updated!');
+  closeEarnAdminModal();
+}
+function adminAddSponsor(){
+  const name=document.getElementById('eSponsorName').value.trim();
+  const desc=document.getElementById('eSponsorDesc').value.trim();
+  if(!name){toast('Sponsor name daalo!');return;}
+  const d=getData();
+  if(!d.sponsors) d.sponsors=[];
+  d.sponsors.push({id:Date.now(),name,logo:'',desc:desc||'Sponsor'});
+  saveData(d);
+  document.getElementById('eSponsorName').value='';
+  document.getElementById('eSponsorDesc').value='';
+  toast('✅ Sponsor added!');
+  closeEarnAdminModal();
+}
+
+// ========== INIT ==========
+function init(){
+  // Fix data - ensure movies have type field
+  const d=getData();
+  let changed=false;
+  d.movies.forEach(m=>{
+    if(!m.type){
+      m.type=(m.url||'').includes('youtube')?'youtube':'direct';
+      changed=true;
+    }
+    if(!m.category) m.category='Movies';
+    if(!m.id) m.id=Date.now()+Math.random();
+    // Fix missing youtubeUrl for existing YouTube movies
+    if(m.type==='youtube' && !m.youtubeUrl && m.url){
+      const vidMatch=m.url.match(/\/([a-zA-Z0-9_-]{11})(?:\?|$)/);
+      if(vidMatch) m.youtubeUrl='https://www.youtube.com/watch?v='+vidMatch[1];
+      changed=true;
+    }
+  });
+  // Init earn data
+  if(!d.referralCode){d.referralCode="MYSTREAM"+Math.random().toString(36).substring(2,6).toUpperCase();changed=true;}
+  if(typeof d.totalReferrals==='undefined'){d.totalReferrals=0;changed=true;}
+  if(typeof d.rewardsClaimed==='undefined'){d.rewardsClaimed=0;changed=true;}
+  if(typeof d.premium==='undefined'){d.premium=false;changed=true;}
+  if(!d.ads||!Array.isArray(d.ads)){d.ads=[{id:1,img:"",link:"",active:true}];changed=true;}
+  if(!d.sponsors||!Array.isArray(d.sponsors)){d.sponsors=[{id:1,name:"Your Brand Here",logo:"",desc:"Sponsor banne ke liye sampark karein"}];changed=true;}
+  if(changed) saveData(d);
+  // Update header name
+  document.querySelector('.logo').innerHTML=`<span>🎬</span> <span>${d.appName||'MyStream'}</span>`;
+  renderHome();
+  // Service worker
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  }
+  // Network status
+  function updateOnlineStatus(){
+    const badge=document.getElementById('navHome').querySelector('.offline-badge');
+    if(badge) badge.className='offline-badge'+(navigator.onLine?'':' off');
+  }
+  window.addEventListener('online',updateOnlineStatus);
+  window.addEventListener('offline',updateOnlineStatus);
+}
+
+document.addEventListener('DOMContentLoaded',init);
+</script>
+</body>
+</html>
