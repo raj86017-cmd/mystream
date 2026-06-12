@@ -19,7 +19,10 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--bg:#0a0a1a;--card:#13133a;--card2:#1a1a4e;--accent:#6c5ce7;--accent2:#a29bfe;--text:#eee;--text2:#888;--nav:#0d0d2b;--shadow:0 4px 20px rgba(0,0,0,.5)}
-body{font-family:-apple-system,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body{font-family:-apple-system,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;position:relative}
+body::before{content:'';position:fixed;inset:0;z-index:-2;background:url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1920&q=80') center/cover no-repeat fixed;opacity:.15}
+body::after{content:'★ MyStream ★';position:fixed;bottom:20px;right:20px;font-size:40px;font-weight:900;color:rgba(108,92,231,.06);z-index:-1;letter-spacing:4px;pointer-events:none;text-transform:uppercase}
+@media(max-width:500px){body::after{font-size:24px;bottom:60px;right:10px}}
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--accent);border-radius:4px}
