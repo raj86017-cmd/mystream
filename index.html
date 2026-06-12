@@ -348,6 +348,8 @@ body{font-family:-apple-system,'Segoe UI',Roboto,sans-serif;background:var(--bg)
     </div>
     <label style="margin-top:12px">📊 Stats</label>
     <p style="font-size:13px;color:var(--text2)" id="eStats"></p>
+    <label style="margin-top:8px">⏳ Premium Requests</label>
+    <div id="ePremiumRequests" style="font-size:13px;max-height:120px;overflow-y:auto;background:var(--card2);border-radius:8px;padding:10px;margin:4px 0"></div>
     <div class="modal-actions">
       <button class="cancel" onclick="closeEarnAdminModal()" style="flex:1">Close</button>
     </div>
@@ -1127,11 +1129,16 @@ function renderEarn(){
       <div style="margin:10px 0;text-align:center;padding:16px;background:var(--card2);border-radius:10px">
         ${premium?`
           <div class="earn-premium-badge">⭐ PREMIUM USER</div>
-          <p style="margin-top:8px;font-size:13px;color:#2ecc71">✅ Aap premium member hain!</p>
+          <p style="margin-top:8px;font-size:13px;color:#2ecc71">✅ Aap premium member hain! Badge active hai.</p>
         `:`
-          <div style="font-size:40px;margin-bottom:8px">⭐</div>
-          <p style="font-size:13px">₹49/month — Ad-free, exclusive content</p>
-          <button class="earn-btn green" onclick="buyPremium()">🌟 Become Premium</button>
+          ${d.premiumRequests&&d.premiumRequests.some(r=>r.status==='pending')?`
+            <div style="font-size:30px;margin-bottom:8px">⏳</div>
+            <p style="font-size:13px;color:#f1c40f">Premium request pending hai...<br><small style="color:var(--text2)">Admin approve karega! UPI payment kar di?</small></p>
+          `:`
+            <div style="font-size:40px;margin-bottom:8px">⭐</div>
+            <p style="font-size:13px">₹49/month — Ad-free, exclusive content</p>
+            <button class="earn-btn green" onclick="buyPremium()">🌟 Become Premium</button>
+          `}
         `}
       </div>
     </div>
@@ -1220,15 +1227,35 @@ function donateUPI(){
   window.location.href=upi;
 }
 function buyPremium(){
+  const d=getData();
+  // Submit premium request
+  if(!d.premiumRequests) d.premiumRequests=[];
+  d.premiumRequests.push({time:Date.now(),paid:false,status:'pending'});
+  saveData(d);
+  // Open UPI for ₹49
   const upi=`upi://pay?pa=bgmitornament@ibl&pn=MyStreamPremium&am=49&cu=INR&tn=Premium Membership ₹49`;
   window.location.href=upi;
-  toast('🌟 UPI se ₹49 bhejein. Admin approve karega!');
+  toast('🌟 UPI se ₹49 bhejein! Admin ko request chala gaya ✅');
+  renderEarn();
 }
 function showEarnAdmin(){
   document.getElementById('earnAdminModal').classList.add('show');
   const d=getData();
   document.getElementById('eStats').textContent=`Referrals: ${d.totalReferrals||0} | Rewards Claimed: ${d.rewardsClaimed||0} | Premium: ${d.premium?'Yes':'No'} | Ads: ${(d.ads||[]).length} | Sponsors: ${(d.sponsors||[]).length}`;
   document.getElementById('eAdImg').value=(d.ads&&d.ads[0]&&d.ads[0].img)||'';
+  // Show premium requests
+  const reqs=d.premiumRequests||[];
+  const reqEl=document.getElementById('ePremiumRequests');
+  if(reqs.length===0){
+    reqEl.innerHTML='<span style="color:var(--text2)">Koi premium request nahi hai</span>';
+  } else {
+    reqEl.innerHTML=reqs.map((r,i)=>`
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05)">
+        <span>#${i+1} — ${r.status==='pending'?'⏳ Pending':'✅ Approved'}<br><small style="font-size:10px;color:var(--text2)">${new Date(r.time).toLocaleDateString('hi-IN')}</small></span>
+        ${r.status==='pending'?`<button onclick="adminApprovePremium(${i})" style="background:#2ecc71;border:none;color:#fff;padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer">✅ Approve</button>`:''}
+      </div>
+    `).join('');
+  }
 }
 function closeEarnAdminModal(){
   document.getElementById('earnAdminModal').classList.remove('show');
@@ -1240,6 +1267,18 @@ function adminTogglePremium(val){
   saveData(d);
   toast(val?'✅ Premium activated!':'❌ Premium removed');
   closeEarnAdminModal();
+}
+function adminApprovePremium(idx){
+  const d=getData();
+  if(d.premiumRequests&&d.premiumRequests[idx]){
+    d.premiumRequests[idx].status='approved';
+    d.premiumRequests[idx].paid=true;
+    d.premium=true;
+    d.premiumExpiry=Date.now()+30*24*60*60*1000;
+    saveData(d);
+    toast('✅ Premium approved! Request #'+(idx+1)+' activated');
+    closeEarnAdminModal();
+  }
 }
 function adminSetAd(){
   const img=document.getElementById('eAdImg').value.trim();
@@ -1290,6 +1329,8 @@ function init(){
   if(typeof d.totalReferrals==='undefined'){d.totalReferrals=0;changed=true;}
   if(typeof d.rewardsClaimed==='undefined'){d.rewardsClaimed=0;changed=true;}
   if(typeof d.premium==='undefined'){d.premium=false;changed=true;}
+  if(typeof d.premiumExpiry==='undefined'){d.premiumExpiry=null;changed=true;}
+  if(!d.premiumRequests||!Array.isArray(d.premiumRequests)){d.premiumRequests=[];changed=true;}
   if(!d.ads||!Array.isArray(d.ads)){d.ads=[{id:1,img:"",link:"",active:true}];changed=true;}
   if(!d.sponsors||!Array.isArray(d.sponsors)){d.sponsors=[{id:1,name:"Your Brand Here",logo:"",desc:"Sponsor banne ke liye sampark karein"}];changed=true;}
   if(changed) saveData(d);
