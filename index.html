@@ -941,19 +941,32 @@ function showTmdbSearch(){
 function closeTmdbModal(){
   document.getElementById('tmdbModal').classList.remove('show');
 }
+function getTmdbHeaders(key){
+  // Support both v3 (api_key) and v4 (Bearer) tokens
+  if(key.startsWith('eyJ')){
+    return {headers:{'Authorization':'Bearer '+key,'Content-Type':'application/json'},mode:'cors'};
+  }
+  return {headers:{'Content-Type':'application/json'},mode:'cors'};
+}
+function getTmdbUrl(key,path){
+  if(key.startsWith('eyJ')) return 'https://api.themoviedb.org/3'+path;
+  return 'https://api.themoviedb.org/3'+path+'&api_key='+key;
+}
 function tmdbSearch(){
   const key=getData().tmdbKey;
   if(!key){toast('TMDB API Key nahi hai!');return;}
   const q=document.getElementById('tmdbQuery').value.trim();
   if(!q){toast('Kuch type karo!');return;}
   document.getElementById('tmdbResults').innerHTML='<p style="color:var(--text2);font-size:13px;text-align:center;padding:20px">🔍 Searching...</p>';
-  fetch(`https://api.themoviedb.org/3/search/movie?api_key=${key}&query=${encodeURIComponent(q)}&language=hi-IN&page=1`)
+  const isBearer=key.startsWith('eyJ');
+  const url=getTmdbUrl(key,'/search/movie?query='+encodeURIComponent(q)+'&language=hi-IN&page=1');
+  const opts=getTmdbHeaders(key);
+  fetch(url,opts)
     .then(r=>r.json())
     .then(data=>{
       if(!data.results||data.results.length===0){
-        // Try English
-        return fetch(`https://api.themoviedb.org/3/search/movie?api_key=${key}&query=${encodeURIComponent(q)}&language=en-US&page=1`)
-          .then(r=>r.json());
+        const url2=getTmdbUrl(key,'/search/movie?query='+encodeURIComponent(q)+'&language=en-US&page=1');
+        return fetch(url2,opts).then(r=>r.json());
       }
       return data;
     })
@@ -985,7 +998,10 @@ function tmdbSearch(){
 }
 function tmdbSelect(movieId){
   const key=getData().tmdbKey;
-  fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${key}&language=hi-IN`)
+  const isBearer=key.startsWith('eyJ');
+  const url=getTmdbUrl(key,'/movie/'+movieId+'?language=hi-IN');
+  const opts=getTmdbHeaders(key);
+  fetch(url,opts)
     .then(r=>r.json())
     .then(m=>{
       document.getElementById('mTitle').value=m.title||'';
