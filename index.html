@@ -931,7 +931,8 @@ function deleteMovie(id){
 
 // ========== TMDB AUTO-FILL ==========
 function showTmdbSearch(){
-  const key=getData().tmdbKey;
+  const d=getData();
+  const key=d.tmdbKey||'';
   if(!key||key.length<10){toast('Pehle Settings mein TMDB API Key daalo! 🔑');return;}
   document.getElementById('tmdbQuery').value=document.getElementById('mTitle').value.trim();
   document.getElementById('tmdbModal').classList.add('show');
