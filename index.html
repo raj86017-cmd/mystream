@@ -444,7 +444,7 @@ const DEFAULTS = {
     {id:2,title:"Sample Web Series",category:"Web Series",url:"https://www.youtube.com/embed/jNQXAC9IVRw",thumb:"",desc:"Sample web series description.",type:"youtube",youtubeUrl:"https://www.youtube.com/watch?v=jNQXAC9IVRw"},
     {id:3,title:"Sample Kids Show",category:"Kids",url:"https://www.youtube.com/embed/77V_n6HpCbA",thumb:"",desc:"Sample kids content.",type:"youtube",youtubeUrl:"https://www.youtube.com/watch?v=77V_n6HpCbA"}
   ],
-  categories: ["Movies","Web Series","Kids","Sports","Live TV"],
+  categories: ["All Movies","Web Series","Anime","Kids","Live TV"],
   password: "movie123",
   appName: "MyStream",
   featuredId: 1,
@@ -574,7 +574,8 @@ function renderHome(){
   const tabsEl = document.getElementById('tabs');
   tabsEl.innerHTML = '<button class="tab active" data-tab="All" onclick="switchTab(\'All\')">🏁 All</button>';
   d.categories.forEach(c=>{
-    tabsEl.innerHTML += `<button class="tab" data-tab="${c}" onclick="switchTab('${c}')">${c}</button>`;
+    const icon = c==='Anime'?'🎌':c==='Web Series'?'📺':c==='Kids'?'🧒':c==='Live TV'?'📡':'📂';
+    tabsEl.innerHTML += `<button class="tab" data-tab="${c}" onclick="switchTab('${c}')">${icon} ${c}</button>`;
   });
   // Grid
   renderGrid(d);
@@ -1084,8 +1085,8 @@ function tmdbSelect(movieId){
       }
       // Auto-set category
       const genres=m.genres||[];
-      if(genres.some(g=>g.name==='Kids'||g.name==='Family'||g.name==='Animation')) document.getElementById('mCategory').value='Kids';
-      else if(genres.some(g=>g.name==='Science Fiction'||g.name==='Action'||g.name==='Adventure')) document.getElementById('mCategory').value='Movies';
+      if(genres.some(g=>g.name==='Kids'||g.name==='Family'||g.name==='Animation')) document.getElementById('mCategory').value='Anime';
+      else if(genres.some(g=>g.name==='Science Fiction'||g.name==='Action'||g.name==='Adventure')) document.getElementById('mCategory').value='All Movies';
       // Set thumbnail from TMDB
       if(m.poster_path){
         document.getElementById('mThumbUrl').value=`https://image.tmdb.org/t/p/w500${m.poster_path}`;
