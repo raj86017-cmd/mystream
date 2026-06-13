@@ -77,6 +77,23 @@ body::after{content:'★ MyStream ★';position:fixed;bottom:20px;right:20px;fon
 .movie-card:active .play-badge{opacity:1;transform:translate(-50%,-50%) scale(1)}
 .movie-thumb .rating-badge{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);padding:2px 7px;border-radius:6px;font-size:10px;font-weight:700;color:#f1c40f;display:flex;align-items:center;gap:2px}
 .movie-thumb .year-badge{position:absolute;top:6px;left:6px;background:rgba(0,0,0,.6);padding:2px 7px;border-radius:6px;font-size:9px;color:rgba(255,255,255,.6)}
+.movie-thumb .quality-badge{position:absolute;bottom:30px;left:6px;background:#e74c3c;padding:2px 7px;border-radius:4px;font-size:9px;font-weight:700;color:#fff;line-height:1.3}
+.movie-thumb .quality-badge.hd{background:#e67e22}
+.movie-thumb .quality-badge.fhd{background:#3498db}
+.movie-thumb .quality-badge.fourk{background:#2ecc71;color:#000}
+.movie-thumb .episode-badge{position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);padding:2px 8px;border-radius:6px;font-size:9px;color:#a29bfe;font-weight:600}
+.movie-thumb .new-badge{position:absolute;top:6px;right:6px;background:linear-gradient(135deg,#e74c3c,#c0392b);padding:2px 10px;border-radius:4px;font-size:9px;font-weight:700;color:#fff;box-shadow:0 2px 10px rgba(231,76,60,.5);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
+.movie-info .audio-badge{display:inline-block;background:rgba(108,92,231,.15);color:#a29bfe;padding:1px 8px;border-radius:10px;font-size:9px;font-weight:600;margin-top:4px}
+.movie-info .dl-badge{display:inline-block;background:rgba(46,204,113,.15);color:#2ecc71;padding:1px 8px;border-radius:10px;font-size:9px;font-weight:600;margin-top:4px;margin-left:4px;cursor:pointer}
+.header .telegram-btn{background:linear-gradient(135deg,#0088cc,#00aced);border:none;color:#fff;padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px;transition:.2s}
+.header .telegram-btn:active{transform:scale(.94)}
+.header .telegram-btn .icon{font-size:14px}
+.player-download{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#2ecc71,#27ae60);color:#fff;padding:10px 20px;border-radius:10px;text-decoration:none;font-size:14px;font-weight:600;margin-top:12px;cursor:pointer;border:none;transition:.2s}
+.player-download:active{transform:scale(.95)}
+.player-telegram{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#0088cc,#00aced);color:#fff;padding:10px 20px;border-radius:10px;text-decoration:none;font-size:14px;font-weight:600;margin-top:12px;margin-left:8px;cursor:pointer;border:none;transition:.2s}
+.player-telegram:active{transform:scale(.95)}
+.player-actions{display:flex;flex-wrap:wrap;gap:4px;margin-top:12px}
 .movie-thumb .type-badge{position:absolute;bottom:6px;left:6px;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);padding:2px 8px;border-radius:6px;font-size:9px;color:#fff}
 .movie-info{padding:10px 12px 12px}
 .movie-title{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -209,6 +226,7 @@ body::after{content:'★ MyStream ★';position:fixed;bottom:20px;right:20px;fon
   <div class="logo"><span>🎬</span> <span>MyStream</span></div>
   <div class="header-actions">
     <button onclick="openSearch()" aria-label="Search">🔍</button>
+    <button class="telegram-btn" onclick="window.open('https://t.me/+C47F1tFnZmI0M2I1','_blank')"><span class="icon">✈️</span> Join</button>
     <button onclick="openAdmin()" aria-label="Admin">⚙️</button>
   </div>
 </div>
@@ -255,7 +273,9 @@ body::after{content:'★ MyStream ★';position:fixed;bottom:20px;right:20px;fon
   <div class="video-wrap" id="videoWrap"></div>
   <div class="player-details">
     <h2 id="playerDetailTitle"></h2>
+    <div id="playerDetailMeta"></div>
     <p id="playerDetailDesc"></p>
+    <div id="playerActions"></div>
     <div id="playerYtLink" style="margin-top:10px"></div>
   </div>
   <div class="related-title">🔁 Related Videos</div>
@@ -331,6 +351,47 @@ body::after{content:'★ MyStream ★';position:fixed;bottom:20px;right:20px;fon
     <input type="text" id="mThumbUrl" placeholder="https://example.com/poster.jpg">
     <label>Description (optional)</label>
     <textarea id="mDesc" placeholder="Movie ke baare mein kuch likhein..."></textarea>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0">
+      <div>
+        <label>Quality</label>
+        <select id="mQuality">
+          <option value="">— Select —</option>
+          <option value="480p">480p</option>
+          <option value="720p">720p</option>
+          <option value="1080p">1080p</option>
+          <option value="2160p">4K</option>
+        </select>
+      </div>
+      <div>
+        <label>Audio</label>
+        <select id="mAudio">
+          <option value="">— None —</option>
+          <option value="Dual Audio [Hindi-English]">Dual Audio [Hindi-English]</option>
+          <option value="Dual Audio [Hindi-Tamil]">Dual Audio [Hindi-Tamil]</option>
+          <option value="Multi Audio [Hindi-English-Tamil]">Multi Audio [Hindi-English-Tamil]</option>
+          <option value="Multi Audio [Hindi-English-Tamil-Telugu]">Multi Audio [Hindi-English-Tamil-Telugu]</option>
+          <option value="Hindi">Hindi</option>
+          <option value="English">English</option>
+          <option value="Tamil">Tamil</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0">
+      <div>
+        <label>Season (for Web Series)</label>
+        <input type="number" id="mSeason" placeholder="e.g. 1" min="1">
+      </div>
+      <div>
+        <label>Episode (for Web Series)</label>
+        <input type="number" id="mEpisode" placeholder="e.g. 6" min="1">
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin:4px 0 10px">
+      <input type="checkbox" id="mIsNew" style="width:18px;height:18px;accent-color:#e74c3c">
+      <label for="mIsNew" style="margin:0;cursor:pointer">🔥 Mark as NEW</label>
+    </div>
+    <label>Download Link (optional)</label>
+    <input type="text" id="mDlUrl" placeholder="https://drive.google.com/... ya .mp4 link">
     <input type="hidden" id="mYear">
     <input type="hidden" id="mRating">
     <div class="modal-actions">
@@ -440,11 +501,11 @@ body::after{content:'★ MyStream ★';position:fixed;bottom:20px;right:20px;fon
 // ========== DATA ==========
 const DEFAULTS = {
   movies: [
-    {id:1,title:"Sample Movie 1",category:"Movies",url:"https://www.youtube.com/embed/dQw4w9WgXcQ",thumb:"",desc:"Yeh ek sample movie hai. Admin panel mein jaakar apni movies add karein!",type:"youtube",youtubeUrl:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-    {id:2,title:"Sample Web Series",category:"Web Series",url:"https://www.youtube.com/embed/jNQXAC9IVRw",thumb:"",desc:"Sample web series description.",type:"youtube",youtubeUrl:"https://www.youtube.com/watch?v=jNQXAC9IVRw"},
-    {id:3,title:"Sample Kids Show",category:"Kids",url:"https://www.youtube.com/embed/77V_n6HpCbA",thumb:"",desc:"Sample kids content.",type:"youtube",youtubeUrl:"https://www.youtube.com/watch?v=77V_n6HpCbA"}
+    {id:1,title:"Sample Movie 1",category:"Bollywood",url:"https://www.youtube.com/embed/dQw4w9WgXcQ",thumb:"",desc:"Yeh ek sample movie hai. Admin panel mein jaakar apni movies add karein!",type:"youtube",youtubeUrl:"https://www.youtube.com/watch?v=dQw4w9WgXcQ",quality:"1080p",audio:"Dual Audio [Hindi-English]",downloadUrl:""},
+    {id:2,title:"Sample Web Series",category:"Web Series",url:"https://www.youtube.com/embed/jNQXAC9IVRw",thumb:"",desc:"Sample web series description.",type:"youtube",youtubeUrl:"https://www.youtube.com/watch?v=jNQXAC9IVRw",quality:"720p",audio:"Multi Audio [Hindi-English-Tamil]",season:1,episode:6,isNew:true,downloadUrl:""},
+    {id:3,title:"Sample Kids Show",category:"Kids",url:"https://www.youtube.com/embed/77V_n6HpCbA",thumb:"",desc:"Sample kids content.",type:"youtube",youtubeUrl:"https://www.youtube.com/watch?v=77V_n6HpCbA",quality:"480p",downloadUrl:""}
   ],
-  categories: ["All Movies","Web Series","Anime","Kids","Live TV"],
+  categories: ["Bollywood","Hollywood","South","Korean","Anime","Web Series","Kids"],
   password: "movie123",
   appName: "MyStream",
   featuredId: 1,
@@ -600,7 +661,10 @@ function renderGrid(d){
     return;
   }
   empty.classList.add('hidden');
-  grid.innerHTML=movies.map(m=>`
+  grid.innerHTML=movies.map(m=>{
+    const qClass=m.quality==='720p'?'hd':m.quality==='1080p'?'fhd':m.quality==='2160p'||m.quality==='4K'?'fourk':'';
+    const epText=m.season&&m.episode?`S${String(m.season).padStart(2,'0')}E${String(m.episode).padStart(2,'0')}`:'';
+    return `
     <div class="movie-card" onclick="playMovie(${m.id})">
       <div class="movie-thumb">
         ${m.thumb
@@ -609,8 +673,11 @@ function renderGrid(d){
         }
         <div class="overlay"></div>
         <div class="play-badge">▶</div>
+        ${m.isNew?`<div class="new-badge">🔥 NEW</div>`:''}
         ${m.rating?`<div class="rating-badge">⭐ ${m.rating}</div>`:''}
         ${m.year?`<div class="year-badge">${m.year}</div>`:''}
+        ${m.quality?`<div class="quality-badge${qClass?' '+qClass:''}">${m.quality}</div>`:''}
+        ${epText?`<div class="episode-badge">${epText}</div>`:''}
         <div class="type-badge">${m.type==='youtube'?'📺 YouTube':m.type==='google-drive'?'☁️ Drive':m.type==='embed'?'🌐 Web':m.type==='local'?'📁 File':'🎞️ Direct'}</div>
       </div>
       <div class="movie-info">
@@ -618,9 +685,11 @@ function renderGrid(d){
         <div class="movie-meta">
           <span class="movie-cat">${m.category}</span>
         </div>
+        ${m.audio?`<div class="audio-badge">🔊 ${m.audio}</div>`:''}
+        ${m.downloadUrl?`<div class="dl-badge" onclick="event.stopPropagation();window.open('${m.downloadUrl}','_blank')">⬇️ Download</div>`:''}
       </div>
     </div>
-  `).join('');
+  `}).join('');
 }
 
 // ========== PLAYER ==========
@@ -635,6 +704,24 @@ function playMovie(id){
   document.getElementById('playerTitle').textContent=m.title;
   document.getElementById('playerDetailTitle').textContent=m.title;
   document.getElementById('playerDetailDesc').textContent=m.desc||'No description';
+
+  // Player metadata — quality, audio, season/episode
+  let metaHtml='<div style="display:flex;flex-wrap:wrap;gap:6px;margin:6px 0">';
+  if(m.quality) metaHtml+=`<span style="background:#e74c3c;color:#fff;padding:2px 10px;border-radius:4px;font-size:11px;font-weight:700">${m.quality}</span>`;
+  if(m.audio) metaHtml+=`<span style="background:rgba(108,92,231,.2);color:#a29bfe;padding:2px 10px;border-radius:10px;font-size:11px">🔊 ${m.audio}</span>`;
+  if(m.season&&m.episode) metaHtml+=`<span style="background:rgba(162,155,254,.15);color:#a29bfe;padding:2px 10px;border-radius:10px;font-size:11px">S${String(m.season).padStart(2,'0')}E${String(m.episode).padStart(2,'0')}</span>`;
+  if(m.year) metaHtml+=`<span style="background:rgba(255,255,255,.08);color:var(--text2);padding:2px 10px;border-radius:4px;font-size:11px">${m.year}</span>`;
+  if(m.rating) metaHtml+=`<span style="color:#f1c40f;font-size:12px">⭐ ${m.rating}</span>`;
+  metaHtml+='</div>';
+  document.getElementById('playerDetailMeta').innerHTML=metaHtml;
+
+  // Download & Telegram buttons
+  let actionHtml='<div class="player-actions">';
+  if(m.downloadUrl) actionHtml+=`<a href="${m.downloadUrl}" target="_blank" rel="noopener" class="player-download">⬇️ Download</a>`;
+  const tgLink='https://t.me/+C47F1tFnZmI0M2I1';
+  actionHtml+=`<a href="${tgLink}" target="_blank" rel="noopener" class="player-telegram">✈️ Telegram</a>`;
+  actionHtml+='</div>';
+  document.getElementById('playerActions').innerHTML=actionHtml;
 
   // YouTube link button (for embed errors)
   const ytLink=document.getElementById('playerYtLink');
@@ -666,20 +753,31 @@ function playMovie(id){
     wrap.innerHTML=`<video src="${m.url}" controls autoplay style="width:100%;height:100%"></video>`;
   }
   // Related
-  const related=d.movies.filter(x=>x.id!==id&&(x.category===m.category||true)).slice(0,4);
-  document.getElementById('relatedGrid').innerHTML=related.map(x=>`
+  const related=d.movies.filter(x=>x.id!==id&&(x.category===m.category||true)).slice(0,6);
+  document.getElementById('relatedGrid').innerHTML=related.map(x=>{
+    const qClass=x.quality==='720p'?'hd':x.quality==='1080p'?'fhd':x.quality==='2160p'||x.quality==='4K'?'fourk':'';
+    const epText=x.season&&x.episode?`S${String(x.season).padStart(2,'0')}E${String(x.episode).padStart(2,'0')}`:'';
+    return `
     <div class="movie-card" onclick="playMovie(${x.id})">
       <div class="movie-thumb">
-        ${x.thumb?`<img src="${x.thumb}" alt="${x.title}" style="width:100%;height:100%;object-fit:cover" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="placeholder" style="display:none">${x.title[0]}</div>`
+        ${x.thumb?`<img src="${x.thumb}" alt="${x.title}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="placeholder" style="display:none">${x.title[0]}</div>`
           :`<div class="placeholder">${x.title[0]||'🎬'}</div>`}
+        <div class="overlay"></div>
         <div class="play-badge">▶</div>
+        ${x.isNew?`<div class="new-badge">🔥 NEW</div>`:''}
+        ${x.quality?`<div class="quality-badge${qClass?' '+qClass:''}">${x.quality}</div>`:''}
+        ${epText?`<div class="episode-badge">${epText}</div>`:''}
+        <div class="type-badge">${x.type==='youtube'?'📺 YouTube':x.type==='google-drive'?'☁️ Drive':x.type==='embed'?'🌐 Web':x.type==='local'?'📁 File':'🎞️ Direct'}</div>
       </div>
       <div class="movie-info">
         <div class="movie-title">${x.title}</div>
-        <div class="movie-meta"><span class="movie-cat">${x.category}</span></div>
+        <div class="movie-meta">
+          <span class="movie-cat">${x.category}</span>
+        </div>
+        ${x.audio?`<div class="audio-badge">🔊 ${x.audio}</div>`:''}
       </div>
     </div>
-  `).join('')||'<div class="empty-state"><p>No related videos</p></div>';
+  `}).join('')||'<div class="empty-state"><p>No related videos</p></div>';
   d.featuredId=id;
   saveData(d);
 }
@@ -851,6 +949,12 @@ function showAddModal(){
   document.getElementById('mThumbUrl').value='';
   document.getElementById('mThumbPreview').classList.add('hidden');
   document.getElementById('mDesc').value='';
+  document.getElementById('mQuality').value='';
+  document.getElementById('mAudio').value='';
+  document.getElementById('mSeason').value='';
+  document.getElementById('mEpisode').value='';
+  document.getElementById('mIsNew').checked=false;
+  document.getElementById('mDlUrl').value='';
   // Populate categories
   const d=getData();
   const sel=document.getElementById('mCategory');
@@ -879,6 +983,12 @@ function editMovie(id){
     document.getElementById('mThumbPreview').classList.add('hidden');
   }
   document.getElementById('mDesc').value=m.desc||'';
+  document.getElementById('mQuality').value=m.quality||'';
+  document.getElementById('mAudio').value=m.audio||'';
+  document.getElementById('mSeason').value=m.season||'';
+  document.getElementById('mEpisode').value=m.episode||'';
+  document.getElementById('mIsNew').checked=m.isNew||false;
+  document.getElementById('mDlUrl').value=m.downloadUrl||'';
   const sel=document.getElementById('mCategory');
   sel.innerHTML=d.categories.map(c=>`<option value="${c}" ${c===m.category?'selected':''}>${c}</option>`).join('');
   document.getElementById('movieModal').classList.add('show');
@@ -963,10 +1073,22 @@ function finishSaveMovie(title,cat,url,thumb,desc,id,d,type,youtubeUrl){
   type=type||'local';
   const year=document.getElementById('mYear').value||'';
   const rating=document.getElementById('mRating').value||'';
+  const quality=document.getElementById('mQuality').value;
+  const audio=document.getElementById('mAudio').value;
+  const season=document.getElementById('mSeason').value;
+  const episode=document.getElementById('mEpisode').value;
+  const isNew=document.getElementById('mIsNew').checked;
+  const downloadUrl=document.getElementById('mDlUrl').value.trim();
   const movie={id,title,category:cat,url,thumb,desc,type};
   if(youtubeUrl) movie.youtubeUrl=youtubeUrl;
   if(year) movie.year=year;
   if(rating) movie.rating=rating;
+  if(quality) movie.quality=quality;
+  if(audio) movie.audio=audio;
+  if(season) movie.season=parseInt(season);
+  if(episode) movie.episode=parseInt(episode);
+  if(isNew) movie.isNew=true;
+  if(downloadUrl) movie.downloadUrl=downloadUrl;
   const existingIdx=d.movies.findIndex(x=>x.id===id);
   if(existingIdx>=0){
     d.movies[existingIdx]=movie;
@@ -1396,6 +1518,13 @@ function init(){
       if(vidMatch) m.youtubeUrl='https://www.youtube.com/watch?v='+vidMatch[1];
       changed=true;
     }
+    // Migrate new fields for existing movies
+    if(typeof m.quality==='undefined'){m.quality='';changed=true;}
+    if(typeof m.audio==='undefined'){m.audio='';changed=true;}
+    if(typeof m.season==='undefined'){m.season='';changed=true;}
+    if(typeof m.episode==='undefined'){m.episode='';changed=true;}
+    if(typeof m.isNew==='undefined'){m.isNew=false;changed=true;}
+    if(typeof m.downloadUrl==='undefined'){m.downloadUrl='';changed=true;}
   });
   // Init earn data
   if(typeof d.tmdbKey==='undefined'){d.tmdbKey='';changed=true;}
